@@ -1,3 +1,4 @@
+import java.util.Arrays;
 void selection_sort() {
   if (!(counter < b.arr.size() )) {
     counter = 0;
@@ -9,9 +10,10 @@ void selection_sort() {
   int initial = counter2;
   if (!b.sorted) {
     Bar min = b.arr.get( counter2 ); 
+    array_access++;
     for (int i =counter2; i < b.arr.size(); ++i) {
       Bar a = b.arr.get(i);
-      array_access+=2;
+      array_access++;
       comparisons++;
       if (min.value > a.value) {
         min.selected = false;
@@ -22,7 +24,6 @@ void selection_sort() {
       SinFreq += a.value;
     }
     Bar a2 = b.arr.get( initial );
-
     float temp = min.value;
     min.value = a2.value;
     a2.value = temp;
@@ -239,10 +240,10 @@ void cocktail_shaker_sort() {
         a2.value = temp;
         array_access+= 2;
         swapped = true;
-      count+=2;
+      SinFreq += a1.value +a2.value;
+        count+=2;
       }
     }
-    SinFreq += a1.value + a2.value;
     for (int k = b.arr.size()-counter-2; k >0; --k) {
       a1 = b.arr.get(k);
       a2 = b.arr.get(k-1);
@@ -257,12 +258,178 @@ void cocktail_shaker_sort() {
         a2.value = temp;
         array_access+= 2;
         swapped = true;
-        count+=2;
+        SinFreq += a1.value + a2.value;
+      count+=2;
       }
     }
-    SinFreq += a1.value + a2.value;
-    SinFreq = map( SinFreq, 4*low, 4*height, 20.0 , 800.0); 
+    SinFreq = map( SinFreq, count*low/2, count*height/2, 20.0 , 800.0); 
   } else {
     SinFreq =0 ;
   }
+}
+
+int part( int l, int r){
+    int i = l;
+    int j = r;
+    float pivot = b.arr.get(l).value;
+    SinFreq = map(abs(pivot), 0, height, 20.0, 800.0);
+    b.arr.get(l).selected = true;
+    array_access++;
+    while(i < j){
+        do{ i++;  comparisons++; array_access++; }while(i  < b.arr.size() && pivot > b.arr.get(i).value );
+        do{ j--;  comparisons++; array_access++; }while(j > 0 && b.arr.get(j).value > pivot);
+        if(i < j && j < b.arr.size()){
+            float temp = b.arr.get(i).value;
+            b.arr.get(i).value = b.arr.get(j).value;
+            b.arr.get(j).value = temp;
+            b.arr.get(j).selected = true;
+            b.arr.get(i).selected = true;
+           array_access+=2;
+            // float temp = b.arr.get(i).value;
+            // b.arr.get(i).value = b.arr.get(j).value;
+            // b.arr.get(j).value = temp;
+        }
+        
+    }
+    
+    float temp = b.arr.get(l).value;
+          b.arr.get(l).value =  b.arr.get(j).value;
+          b.arr.get(j).value = temp;
+          array_access++;
+    // float temp = b.arr.get(l).value;
+    // b.arr.get(l).value = b.arr.get(j).value;
+    // b.arr.get(j).value = temp;
+    return j;
+}
+void quick_sort(  ){
+
+   //println("called for: " + l + " : " + r);
+    // int next_pivot = part(arr,l,r);
+//   quick_sort(arr,l,next_pivot);
+//   quick_sort(arr,next_pivot+1,r);
+  if(b.sorted)  return;
+  int l = 0;
+  int r = b.arr.size();
+  
+    //int stack[] = new int[r-l+1];
+  if(!b.sorted && stack.empty()){
+    stack.push(l);  //stack[++top] = l;
+    stack.push(r);  //stack[++top] = r;
+  }
+    //System.out.println(top);
+    if(!stack.empty()){
+        r = stack.pop();
+        l = stack.pop();
+        int pivot = part(l,r);
+        //System.out.println("Pivot is: " + pivot);
+        if(pivot-1 > l){
+            stack.push(l);  //stack[++top] = l;
+            stack.push(pivot);  //stack[++top] = pivot;
+        }
+        if( pivot +1< r ){
+            stack.push(pivot+1);  //stack[++top] = pivot+1;
+            stack.push(r);  //stack[++top] = r;
+        }
+    } 
+    if(stack.empty()){
+      b.sorted = true;
+    }
+}
+
+void heapify(){
+    int n = b.arr.size();
+    for(int i = n-1; i >= 0; --i){
+        int j = i;
+        while(j <n){
+            int child = 2*(j)+1;
+            if(child >= n-1)  break;   //no childs
+            int comp_child = child;
+            comparisons++;
+            array_access+=2;
+            if( b.arr.get(child).value > b.arr.get(child+1).value ){
+                comp_child = child;
+            }
+            else if( child+1 < n ){
+                comp_child = child+1;
+            }
+            comparisons++;
+            array_access+=2;
+            if( b.arr.get(comp_child).value > b.arr.get(j).value){
+                // swap(arr[j], arr[comp_child]);
+                float temp = b.arr.get(j).value;
+                b.arr.get(j).value = b.arr.get(comp_child).value;
+                b.arr.get(comp_child).value = temp;
+                
+                //b.arr.get(j).selected = true;
+                //b.arr.get(comp_child).selected = true;
+                Bar a1 = b.arr.get(j);
+                Bar a2= b.arr.get(comp_child);
+       
+            }
+            j = comp_child;
+        }
+    }
+}
+void delete_heap(int n){
+    if(n < 0)   return ;
+    int ind = 0;
+    int i = 1;
+    //float ele = b.arr.get(0).value;
+    // swap( arr[0],arr[n-1] );
+    
+    float temp = b.arr.get(n-1).value;
+    b.arr.get(n-1).value = b.arr.get(0).value;
+    b.arr.get(0).value = temp;
+    array_access+=2;
+    while(i < n-1){
+        int comp_ind = i;
+        comparisons++;
+        array_access+=2;
+        if(b.arr.get(i).value > b.arr.get(i+1).value ){
+            comp_ind = i;
+        }
+        else if(i+1 < n-1 ){
+            comp_ind = i + 1;
+        }
+        comparisons++;
+        array_access+=2;
+        if( b.arr.get(comp_ind).value >  b.arr.get(ind).value){
+            // swap(arr[ind], arr[comp_ind]);
+            //temp = arr[ind];
+            //arr[ind] = arr[comp_ind];
+            //arr[comp_ind] = temp;
+          
+            temp = b.arr.get(ind).value;
+            b.arr.get(ind).value = b.arr.get(comp_ind).value;
+            b.arr.get(comp_ind).value = temp;
+            
+            b.arr.get(ind).selected = true;
+            b.arr.get(comp_ind).selected = true;
+            ind = comp_ind;
+            
+            //Bar a1 = b.arr.get(ind);
+            Bar a2 = b.arr.get(ind);
+            SinFreq = map(abs(a2.value)*2, 0, height, 20.0, 800.0);
+            
+        }else  break;
+        i = 2*(ind) +1;
+    }
+}
+void heap_sort(){
+    if(b.sorted)  return;
+    int n = b.arr.size();
+    if(counter == 0)  heapify();
+    else if(counter == n){
+      b.sorted=true;
+      return;  
+    }
+    // else{
+    //     for(int i = 1 ; i < n; ++i){
+    //         insert_heap(arr,i,compare);
+    //     }
+    // }
+    //for(int i =0; i < n; ++i){
+    delete_heap(n-counter);    
+    counter++;
+   
 }

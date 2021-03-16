@@ -1,5 +1,5 @@
 import processing.sound.*;
-
+import java.util.*;
 int low = 10;  //The least value a bar can get;
 long comparisons = 0;//The number of comparisons
 long array_access =0;//The number of times it accesses OR changes the elements of the array
@@ -11,16 +11,17 @@ TriOsc fin;  //The final sound;
 float wid;
 Bars b;
 boolean swapped = true;
-int array_length =25;
+int array_length =400;
 int counter =0;  //The i variable
 int counter2 = 0;  //The j variable
 int counter3 = 0;  //The k variable (if needed)
+Stack<Integer> stack;   //Stack for iterative version of recursive functions
 int gap =1;  //The gaping between the bars
 
 int hk=0;
 float SinFreq=0;
 boolean made_final_sound = false;  //The sound when it has finished sorting
-char curr_sort = 'b'; //b for bubble sort
+char curr_sort = 'q'; //b for bubble sort
                       //s for selection sort
                       //i for insertion sort
                       //d for double selection sort
@@ -28,10 +29,10 @@ char curr_sort = 'b'; //b for bubble sort
 void setup(){
   colorMode(HSB,100);
   fullScreen();
+  //size(800,600);
   counter = 0;
   counter2 =0;
-  if(curr_sort =='i')
-  counter =1;
+  if(curr_sort =='i')  counter =1;
   wid = width/array_length;
   b = new Bars(int(width/(wid+gap)) -1, wid );  
 
@@ -45,20 +46,23 @@ void setup(){
 //  fin.play();
   fin.freq(0); 
   fin.amp(1.0);
-  
+  counter = 0;
+  counter2 = b.arr.size();
+  stack = new Stack<Integer>();
+  //quick_sort(0,b.arr.size());
   fill(100);
   noStroke();
 }
 void draw(){
   background(0);
-  
   if(curr_sort == 'b'){
-     textSize(30);
+    deep_bubble_sort();   
+    textSize(30);
      fill(100,100,100);
      text("Bubble Sort with small dataset (just to visualize it properly):",50,50);
-     deep_bubble_sort();  
+     
   }
-  if(curr_sort == 'B')
+  else if(curr_sort == 'B')
    {
      textSize(30);
      fill(100,100,100);
@@ -90,6 +94,18 @@ void draw(){
     fill(80,100,100);
     text("Cocktail Shaker Sort:",50,50);
   } //<>//
+  else if(curr_sort == 'h'){
+    heap_sort();
+    textSize(30);
+    fill(80,100,100);
+    text("Heap sort:",50,50);
+  }
+  else{
+    quick_sort(  ); 
+    textSize(30);
+    fill(80,100,100);
+    text("Quick Sort:",50,50);
+  }
   b.display();
   
  sin.freq(SinFreq);
@@ -119,7 +135,7 @@ void draw(){
 //if any sorting key is being pressed
 boolean sorting_key_pressed(char c){
   return (c == 'b' || c == 'B' || c == 's' || c == 'S' || c == 'i' || c == 'I'
-          || c == 'D' || c == 'd' || c == 'c' || c == 'C');
+          || c == 'D' || c == 'd' || c == 'c' || c == 'C' || c == 'q' || c == 'Q' || c == 'h' || c == 'H');
 }
 void keyPressed(){ //<>//
   if(key == ' '){
@@ -147,7 +163,8 @@ void keyPressed(){ //<>//
        else{//Showing the process
         array_length = 30;
         curr_sort = 'b';
-       }
+       counter2 =1;  
+     }
     }
     else if(key =='s' || key == 'S'){
       array_length = 400;
@@ -160,6 +177,15 @@ void keyPressed(){ //<>//
     else if (key == 'd' || key == 'D'){
         array_length = 400;
         curr_sort = 'd';
+    }
+    else if(key == 'q' || key == 'Q'){
+      array_length = 400;
+      stack = new Stack<Integer>();
+      curr_sort = 'q';
+    }
+    else if(key == 'H' || key == 'h'){
+      array_length = 400;
+      curr_sort = 'h';
     }
     else{
         array_length = 400;
